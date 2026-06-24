@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 45% 10%;
+    --foreground: 188 100% 90%;
+    --card: 210 40% 8%;
+    --card-foreground: 188 100% 88%;
+    --primary: 186 57% 60%;
+    --primary-foreground: 210 45% 10%;
+    --secondary: 201 69% 31%;
+    --secondary-foreground: 188 100% 90%;
+    --muted: 210 40% 12%;
+    --muted-foreground: 188 30% 70%;
+    --accent: 186 57% 60%;
+    --accent-foreground: 210 45% 10%;
+    --border: 201 69% 20%;
+    --input: 201 69% 20%;
+    --ring: 186 57% 60%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-deep-navy font-poppins text-soft-neon;
+    background: linear-gradient(135deg, #001c30 0%, #0a2a4a 100%);
+  }
+}
+
+@layer components {
+  .text-neon {
+    color: #64ccc5;
+    text-shadow: 0 0 10px rgba(100, 204, 197, 0.5);
+  }
+
+  .gradient-text {
+    background: linear-gradient(45deg, #64ccc5, #176b87);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-effect {
+    background: rgba(100, 204, 197, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(100, 204, 197, 0.24);
+  }
+
+  .btn-primary {
+    @apply rounded-xl bg-aqua-neon px-6 py-3 font-semibold text-deep-navy transition hover:scale-[1.02];
+  }
+
+  .btn-secondary {
+    @apply rounded-xl border-2 border-aqua-neon px-6 py-3 font-semibold text-aqua-neon transition hover:bg-aqua-neon hover:text-deep-navy;
+  }
+
+  .section-padding {
+    @apply px-6 py-20 lg:px-12;
+  }
+
+  .cube-3d {
+    transform-style: preserve-3d;
+    animation: rotate-cube 20s linear infinite;
+  }
+
+  .cube-face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, rgba(100, 204, 197, 0.8), rgba(23, 107, 135, 0.8));
+    border: 2px solid rgba(100, 204, 197, 0.3);
+  }
+
+  .cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(50px); }
+  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(50px); }
+  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(50px); }
+  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(50px); }
+  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(50px); }
+  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(50px); }
+
+  .laptop-3d {
+    perspective: 1000px;
+    animation: float 6s ease-in-out infinite;
+  }
+}

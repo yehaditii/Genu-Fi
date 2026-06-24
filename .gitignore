@@ -11,6 +11,16 @@ node_modules
 dist
 dist-ssr
 *.local
+coverage
+.env
+.env.*
+!.env.example
+backend/node_modules
+frontend/node_modules
+backend/dist
+frontend/dist
+contracts/target
+contracts/.stellar
 
 # Editor directories and files
 .vscode/*

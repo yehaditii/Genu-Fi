@@ -1,0 +1,23 @@
+name: Contracts
+
+on:
+  push:
+    paths:
+      - "contracts/**"
+  pull_request:
+    paths:
+      - "contracts/**"
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo test
+      - run: cargo build --release
