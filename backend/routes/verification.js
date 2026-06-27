@@ -2,6 +2,11 @@ const express = require("express");
 const VerificationRequest = require("../models/VerificationRequest");
 const { verifyCredential } = require("../services/stellarService");
 
+function notImplementedResponse(message) {
+  return { implemented: false, message };
+}
+
+
 const router = express.Router();
 
 router.post("/verify", async (req, res, next) => {
@@ -11,10 +16,15 @@ router.post("/verify", async (req, res, next) => {
       credentialId: req.body.credentialId,
       requesterAddress: req.body.requesterAddress,
       isValid: result.isValid,
-      transactionHash: `verify-${Date.now()}`,
+      transactionHash: result.transactionHash || "",
     });
 
-    res.status(201).json({ success: true, verification, result });
+    res.status(201).json({
+      success: true,
+      verification,
+      result,
+    });
+
   } catch (error) {
     next(error);
   }

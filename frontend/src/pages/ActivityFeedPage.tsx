@@ -4,7 +4,19 @@ import Header from "@/components/Header";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
 const ActivityFeedPage = () => {
-  const { events, isConnected } = useWebSocket(import.meta.env.VITE_EVENTS_WS_URL);
+  const { events, isConnected, isLoading, isReconnecting, error } = useWebSocket(
+    (import.meta as any)?.env?.VITE_EVENTS_WS_URL
+  );
+
+  const statusText = isConnected
+    ? "Live stream connected"
+    : isLoading
+      ? "Connecting..."
+      : isReconnecting
+        ? "Reconnecting..."
+        : error
+          ? `Error: ${error}`
+          : "No events yet";
 
   return (
     <div className="min-h-screen">
@@ -17,11 +29,19 @@ const ActivityFeedPage = () => {
               <h1 className="mt-2 text-4xl font-bold text-neon">Network Activity</h1>
             </div>
             <span className="rounded-full border border-aqua-neon/40 px-4 py-2 text-sm text-aqua-neon">
-              {isConnected ? "Live stream connected" : "Showing cached sample events"}
+              {statusText}
             </span>
           </div>
 
-          <ActivityFeed events={events} />
+          {error ? (
+            <div className="glass-effect rounded-2xl p-6 text-soft-neon/80">{error}</div>
+          ) : isLoading ? (
+            <div className="glass-effect rounded-2xl p-6 text-soft-neon/80">Loading events…</div>
+          ) : events.length === 0 ? (
+            <div className="glass-effect rounded-2xl p-6 text-soft-neon/80">No events available.</div>
+          ) : (
+            <ActivityFeed events={events} />
+          )}
         </div>
       </main>
       <Footer />
@@ -30,3 +50,4 @@ const ActivityFeedPage = () => {
 };
 
 export default ActivityFeedPage;
+

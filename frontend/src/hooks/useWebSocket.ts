@@ -8,58 +8,103 @@ export interface ActivityEvent {
   timestamp: string;
 }
 
-const sampleEvents: ActivityEvent[] = [
-  {
-    id: "evt-1",
-    type: "institution_registered",
-    title: "Institution joined",
-    description: "A new institution completed onboarding on Stellar testnet.",
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: "evt-2",
-    type: "credential_issued",
-    title: "Credential issued",
-    description: "A learner received a verifiable skill credential.",
-    timestamp: new Date().toISOString(),
-  },
-];
-
 export function useWebSocket(url?: string) {
-  const [events, setEvents] = useState<ActivityEvent[]>(sampleEvents);
+  const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!url);
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!url) {
+      setIsConnected(false);
+      setIsLoading(false);
+      setIsReconnecting(false);
+      setError(null);
       return;
     }
 
-    try {
-      const socket = new WebSocket(url);
+    let socket: WebSocket | null = null;
+    let cancelled = false;
+    let reconnectTimer: number | undefined;
 
-      socket.onopen = () => setIsConnected(true);
-      socket.onclose = () => setIsConnected(false);
-      socket.onerror = () => setIsConnected(false);
-      socket.onmessage = (message) => {
-        try {
-          const payload = JSON.parse(message.data) as ActivityEvent;
-          setEvents((current) => [payload, ...current].slice(0, 20));
-        } catch {
-          // Ignore malformed events until the backend stream is wired to production deployments.
-        }
-      };
+    setIsLoading(true);
+    setIsReconnecting(false);
+    setError(null);
 
-      return () => socket.close();
-    } catch {
-      setIsConnected(false);
-    }
+    const connect = () => {
+      if (cancelled) return;
+
+      setIsLoading(() => !isReconnecting);
+      setIsReconnecting(() => !isConnected);
+
+
+      try {
+        socket = new WebSocket(url);
+
+        socket.onopen = () => {
+          if (cancelled) return;
+          setIsConnected(true);
+          setIsLoading(false);
+          setIsReconnecting(false);
+          setError(null);
+        };
+
+        socket.onclose = () => {
+          if (cancelled) return;
+          setIsConnected(false);
+          setIsLoading(false);
+          setIsReconnecting(true);
+
+          reconnectTimer = window.setTimeout(() => {
+            connect();
+          }, 2000);
+        };
+
+        socket.onerror = () => {
+          if (cancelled) return;
+          setIsConnected(false);
+          setIsLoading(false);
+          setIsReconnecting(false);
+          setError("WebSocket connection failed");
+        };
+
+        socket.onmessage = (message) => {
+          try {
+            const payload = JSON.parse(message.data) as ActivityEvent;
+            if (!payload?.id || !payload?.type || !payload?.timestamp) return;
+            setEvents((current: ActivityEvent[]) => [payload, ...current].slice(0, 20));
+          } catch {
+            // Ignore malformed events.
+          }
+        };
+      } catch {
+        setIsConnected(false);
+        setIsLoading(false);
+        setIsReconnecting(false);
+        setError("WebSocket initialization failed");
+      }
+    };
+
+    connect();
+
+    return () => {
+      cancelled = true;
+      if (reconnectTimer) window.clearTimeout(reconnectTimer);
+      socket?.close();
+    };
   }, [url]);
 
   return useMemo(
     () => ({
       events,
       isConnected,
+      isLoading,
+      isReconnecting,
+      error,
     }),
-    [events, isConnected]
+    [events, isConnected, isLoading, isReconnecting, error]
   );
 }
+
+

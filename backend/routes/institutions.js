@@ -2,6 +2,11 @@ const express = require("express");
 const Institution = require("../models/Institution");
 const { registerInstitution } = require("../services/stellarService");
 
+function notImplementedResponse(message) {
+  return { implemented: false, message };
+}
+
+
 const router = express.Router();
 
 router.post("/register", async (req, res, next) => {

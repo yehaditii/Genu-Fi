@@ -2,6 +2,11 @@ const express = require("express");
 const Credential = require("../models/Credential");
 const { issueCredential } = require("../services/stellarService");
 
+function notImplementedResponse(message) {
+  return { implemented: false, message };
+}
+
+
 const router = express.Router();
 
 router.post("/", async (req, res, next) => {

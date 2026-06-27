@@ -1,28 +1,15 @@
-const cron = require("node-cron");
-
-const recentEvents = [
-  {
-    id: "evt-1",
-    type: "institution_registered",
-    title: "Institution joined",
-    description: "A new institution registered with the Stellar-backed network.",
-    timestamp: new Date().toISOString(),
-  },
-];
-
+// NOTE: Activity is NOT ingested from Soroban yet.
+// IMPORTANT: do not cache/fabricate activity. Always return an empty feed.
 let websocketServer;
 
 function setWebSocketServer(wss) {
   websocketServer = wss;
 }
 
+// Broadcast only real backend events.
+// (Since ingestion is currently disabled, nothing will be broadcast.)
 function broadcastEvent(event) {
-  recentEvents.unshift(event);
-  recentEvents.splice(20);
-
-  if (!websocketServer) {
-    return;
-  }
+  if (!websocketServer) return;
 
   websocketServer.clients.forEach((client) => {
     if (client.readyState === 1) {
@@ -32,19 +19,11 @@ function broadcastEvent(event) {
 }
 
 function startPolling() {
-  cron.schedule("*/10 * * * * *", () => {
-    broadcastEvent({
-      id: `evt-${Date.now()}`,
-      type: "heartbeat",
-      title: "Soroban poll cycle",
-      description: "Backend polled for Soroban events and refreshed the local feed.",
-      timestamp: new Date().toISOString(),
-    });
-  });
+  // Intentionally disabled until real Soroban event ingestion is implemented.
 }
 
 function getRecentEvents() {
-  return recentEvents;
+  return [];
 }
 
 module.exports = {
@@ -53,3 +32,4 @@ module.exports = {
   setWebSocketServer,
   startPolling,
 };
+
