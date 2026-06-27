@@ -16,8 +16,10 @@ jobs:
         working-directory: contracts
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
         with:
-          targets: wasm32-unknown-unknown
-      - run: cargo test
-      - run: cargo build --release
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          profile: minimal
+      - run: cargo test --workspace --all
+      - run: cargo build --workspace --release --target wasm32-unknown-unknown
