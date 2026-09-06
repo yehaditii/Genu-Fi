@@ -19,15 +19,15 @@ const ReputationScore = ({ score }: Props) => {
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <div>
           <p className="text-sm text-soft-neon/60">Hackathons</p>
-          <p className="text-xl font-semibold text-soft-neon">{score.hackathonCount}</p>
+            <p className="text-xl font-semibold text-soft-neon">{score.hackathonCount ?? 0}</p>
         </div>
         <div>
           <p className="text-sm text-soft-neon/60">Internships</p>
-          <p className="text-xl font-semibold text-soft-neon">{score.internshipCount}</p>
+            <p className="text-xl font-semibold text-soft-neon">{score.internshipCount ?? 0}</p>
         </div>
         <div>
           <p className="text-sm text-soft-neon/60">Courses</p>
-          <p className="text-xl font-semibold text-soft-neon">{score.courseCount}</p>
+            <p className="text-xl font-semibold text-soft-neon">{score.courseCount ?? 0}</p>
         </div>
       </div>
     </div>

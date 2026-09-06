@@ -1,95 +1,68 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{Address, Env, String, Symbol};
+use soroban_sdk::{testutils::Address as _, Address, Env, String};
 
-fn random_address(env: &Env) -> Address {
-    // Deterministically derived address for SDK22 test compatibility.
-    Address::from_str(
-        env,
-        "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    )
+fn setup() -> (Env, Address, Address, Address) {
+    let env = Env::default();
+    let contract_id = env.register(InstitutionRegistryContract, ());
+    let admin = Address::generate(&env);
+    let institution = Address::generate(&env);
+    (env, contract_id, admin, institution)
 }
 
 #[test]
-fn test_register_and_get_institution() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, InstitutionRegistryContract);
-    let wallet = random_address(&env);
-
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("register_institution"),
-        (&String::from_str(&env, "GenuFi University"), wallet.clone(), &String::from_str(&env, "https://genu.fi/institution.json")),
+fn registers_and_retrieves_institution() {
+    let (env, contract_id, admin, institution) = setup();
+    env.mock_all_auths();
+    let client = InstitutionRegistryClient::new(&env, &contract_id);
+    client.init_admin(&admin);
+    client.register_institution(
+        &String::from_str(&env, "GenuFi University"),
+        &institution,
+        &String::from_str(&env, "ipfs://institution"),
     );
 
-    let result: Option<Institution> = env.invoke_contract(
-        &contract_id,
-        &symbol_short!("get_institution"),
-        (wallet.clone(),),
-    );
-
-    assert!(result.is_some());
-    let institution = result.unwrap();
-    assert_eq!(institution.name, String::from_str(&env, "GenuFi University"));
-    assert_eq!(institution.wallet_address, wallet);
-    assert!(!institution.verified);
+    let stored = client.get_institution(&institution).unwrap();
+    assert_eq!(stored.name, String::from_str(&env, "GenuFi University"));
+    assert!(!stored.verified);
 }
 
 #[test]
-fn test_verify_institution() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, InstitutionRegistryContract);
-    let wallet = random_address(&env);
-
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("register_institution"),
-        (&String::from_str(&env, "GenuFi University"), wallet.clone(), &String::from_str(&env, "https://genu.fi/institution.json")),
+fn admin_can_verify_and_revoke_institution() {
+    let (env, contract_id, admin, institution) = setup();
+    env.mock_all_auths();
+    let client = InstitutionRegistryClient::new(&env, &contract_id);
+    client.init_admin(&admin);
+    client.register_institution(
+        &String::from_str(&env, "GenuFi University"),
+        &institution,
+        &String::from_str(&env, "ipfs://institution"),
     );
-
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("verify_institution"),
-        (wallet.clone(),),
-    );
-    let is_verified: bool = env.invoke_contract(
-        &contract_id,
-        &symbol_short!("is_verified"),
-        (wallet.clone(),),
-    );
-
-    assert!(is_verified);
+    client.verify_institution(&institution);
+    assert!(client.is_verified(&institution));
+    client.revoke_institution(&institution);
+    assert!(!client.is_verified(&institution));
 }
 
 #[test]
-fn test_revoke_institution() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, InstitutionRegistryContract);
-    let wallet = random_address(&env);
+fn duplicate_and_unauthorized_operations_fail() {
+    let (env, contract_id, admin, institution) = setup();
+    let client = InstitutionRegistryClient::new(&env, &contract_id);
+    assert!(client.try_init_admin(&admin).is_err());
 
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("register_institution"),
-        (&String::from_str(&env, "GenuFi University"), wallet.clone(), &String::from_str(&env, "https://genu.fi/institution.json")),
+    env.mock_all_auths();
+    client.init_admin(&admin);
+    client.register_institution(
+        &String::from_str(&env, "GenuFi University"),
+        &institution,
+        &String::from_str(&env, "ipfs://institution"),
     );
-
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("verify_institution"),
-        (wallet.clone(),),
-    );
-    env.invoke_contract(
-        &contract_id,
-        &symbol_short!("revoke_institution"),
-        (wallet.clone(),),
-    );
-
-    let is_verified: bool = env.invoke_contract(
-        &contract_id,
-        &symbol_short!("is_verified"),
-        (wallet.clone(),),
-    );
-    assert!(!is_verified);
+    assert!(client
+        .try_register_institution(
+            &String::from_str(&env, "Duplicate"),
+            &institution,
+            &String::from_str(&env, "ipfs://duplicate"),
+        )
+        .is_err());
 }
-

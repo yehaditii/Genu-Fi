@@ -21,6 +21,8 @@ backend/dist
 frontend/dist
 contracts/target
 contracts/.stellar
+contracts/**/test_snapshots
+contracts/target/testnet-contract-ids.env
 
 # Editor directories and files
 .vscode/*

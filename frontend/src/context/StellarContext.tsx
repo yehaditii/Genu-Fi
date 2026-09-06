@@ -6,7 +6,8 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import { isConnected, requestAccess } from "@stellar/freighter-api";
+import { isConnected, requestAccess, signTransaction as freighterSignTransaction } from "@stellar/freighter-api";
+import { frontendEnv } from "@/config/env";
 import type { WalletState } from "@/types/stellar";
 
 interface StellarContextValue extends WalletState {
@@ -19,7 +20,7 @@ const StellarContext = createContext<StellarContextValue | undefined>(undefined)
 
 export function StellarProvider({ children }: PropsWithChildren) {
   const [publicKey, setPublicKey] = useState<string | null>(null);
-  const network = import.meta.env.VITE_STELLAR_NETWORK ?? "TESTNET";
+  const network = frontendEnv.stellarNetwork;
 
   const connectWallet = useCallback(async () => {
     const connection = await isConnected();
@@ -41,7 +42,22 @@ export function StellarProvider({ children }: PropsWithChildren) {
     setPublicKey(null);
   }, []);
 
-  const signTransaction = useCallback(async (xdr: string) => xdr, []);
+  const signTransaction = useCallback(
+    async (xdr: string) => {
+      if (!publicKey) {
+        throw new Error("Connect a Freighter wallet before signing.");
+      }
+      const result = await freighterSignTransaction(xdr, {
+        address: publicKey,
+        networkPassphrase: frontendEnv.stellarNetworkPassphrase,
+      });
+      if (result.error || !result.signedTxXdr) {
+        throw new Error(result.error?.message || "Freighter did not sign the transaction.");
+      }
+      return result.signedTxXdr;
+    },
+    [publicKey]
+  );
 
   const value = useMemo<StellarContextValue>(
     () => ({

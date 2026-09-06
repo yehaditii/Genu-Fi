@@ -1,11 +1,12 @@
 import ActivityFeed from "@/components/ActivityFeed";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { frontendEnv } from "@/config/env";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
 const ActivityFeedPage = () => {
   const { events, isConnected, isLoading, isReconnecting, error } = useWebSocket(
-    (import.meta as any)?.env?.VITE_EVENTS_WS_URL
+    frontendEnv.eventsWsUrl || undefined
   );
 
   const statusText = isConnected

@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const { env } = require("./env");
 
 async function connectDatabase() {
-  const mongoUri = process.env.MONGODB_URI;
+  const mongoUri = env.mongodbUri;
   if (!mongoUri) {
     return;
   }

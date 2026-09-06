@@ -1,7 +1,22 @@
 import { useStellar } from "@/context/StellarContext";
+import { useState } from "react";
 
 const WalletConnector = () => {
   const { publicKey, isConnected, connectWallet, disconnectWallet } = useStellar();
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleConnect = async () => {
+    setIsConnecting(true);
+    setError(null);
+    try {
+      await connectWallet();
+    } catch (connectionError) {
+      setError(connectionError instanceof Error ? connectionError.message : "Wallet connection failed.");
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   return isConnected ? (
     <div className="flex items-center gap-3">
@@ -13,9 +28,12 @@ const WalletConnector = () => {
       </button>
     </div>
   ) : (
-    <button className="btn-primary" onClick={() => void connectWallet()}>
-      Connect Freighter
-    </button>
+    <div>
+      <button className="btn-primary" onClick={() => void handleConnect()} disabled={isConnecting}>
+        {isConnecting ? "Connecting..." : "Connect Freighter"}
+      </button>
+      {error && <p className="mt-2 max-w-xs text-xs text-red-300">{error}</p>}
+    </div>
   );
 };
 
