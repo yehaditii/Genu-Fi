@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { env } = require("./env");
+const { captureError } = require("../services/monitoring");
 
 async function connectDatabase() {
   const mongoUri = env.mongodbUri;
@@ -7,7 +8,12 @@ async function connectDatabase() {
     return;
   }
 
-  await mongoose.connect(mongoUri);
+  try {
+    await mongoose.connect(mongoUri);
+  } catch (error) {
+    captureError(error, { category: "database_failure", operation: "connect" });
+    throw error;
+  }
 }
 
 module.exports = { connectDatabase };

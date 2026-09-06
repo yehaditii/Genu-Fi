@@ -24,6 +24,10 @@ const env = {
   credentialRegistryId: process.env.CREDENTIAL_REGISTRY_ID || "",
   reputationContractId: process.env.REPUTATION_CONTRACT_ID || "",
   verificationContractId: process.env.VERIFICATION_CONTRACT_ID || "",
+  sentryDsn: process.env.SENTRY_DSN || "",
+  sentryEnabled: process.env.SENTRY_ENABLED === "true",
+  sentryEnvironment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || "development",
+  sentryTracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0),
   corsOrigins: parseList(
     process.env.CORS_ORIGINS ||
       "http://localhost:8080,http://localhost:5173,https://genu-fi.vercel.app"

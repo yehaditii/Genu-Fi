@@ -32,6 +32,25 @@
     @apply bg-deep-navy font-poppins text-soft-neon;
     background: linear-gradient(135deg, #001c30 0%, #0a2a4a 100%);
   }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #64ccc5;
+    outline-offset: 3px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(218, 255, 251, 0.48);
+  }
 }
 
 @layer components {
@@ -54,15 +73,43 @@
   }
 
   .btn-primary {
-    @apply rounded-xl bg-aqua-neon px-6 py-3 font-semibold text-deep-navy transition hover:scale-[1.02];
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl bg-aqua-neon px-6 py-3 text-center font-semibold text-deep-navy transition hover:scale-[1.02] hover:bg-[#7adbd5] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100;
   }
 
   .btn-secondary {
-    @apply rounded-xl border-2 border-aqua-neon px-6 py-3 font-semibold text-aqua-neon transition hover:bg-aqua-neon hover:text-deep-navy;
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-aqua-neon px-6 py-3 text-center font-semibold text-aqua-neon transition hover:bg-aqua-neon hover:text-deep-navy disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-aqua-neon;
   }
 
   .section-padding {
-    @apply px-6 py-20 lg:px-12;
+    @apply px-4 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-20;
+  }
+
+  .dashboard-heading {
+    @apply max-w-3xl;
+  }
+
+  .form-control {
+    @apply min-h-12 w-full rounded-xl border border-aqua-neon/20 bg-deep-navy/50 px-4 py-3 text-soft-neon transition placeholder:text-soft-neon/50 focus:border-aqua-neon focus:bg-deep-navy/70;
+  }
+
+  .status-panel {
+    @apply rounded-xl border p-4 text-sm;
+  }
+
+  .status-panel-info {
+    @apply border-aqua-neon/30 bg-aqua-neon/5 text-aqua-neon;
+  }
+
+  .status-panel-success {
+    @apply border-emerald-300/30 bg-emerald-300/5 text-emerald-200;
+  }
+
+  .status-panel-error {
+    @apply border-red-300/30 bg-red-300/5 text-red-200;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-soft-neon/10;
   }
 
   .cube-3d {

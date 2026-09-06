@@ -1,5 +1,6 @@
 import { contractIds } from "@/utils/contracts";
 import { frontendEnv } from "@/config/env";
+import { captureError } from "@/lib/monitoring";
 import type {
   Credential,
   PreparedTransaction,
@@ -13,15 +14,26 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error("VITE_API_URL must be configured for production API access.");
   }
 
-  const response = await fetch(`${frontendEnv.apiUrl}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-    ...init,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${frontendEnv.apiUrl}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+      },
+      ...init,
+    });
+  } catch (error) {
+    captureError(error, { category: "api_failure", method: init?.method || "GET", failure: "network" });
+    throw error;
+  }
 
   if (!response.ok) {
+    captureError(new Error("API request failed"), {
+      category: "api_failure",
+      method: init?.method || "GET",
+      status: response.status,
+    });
     const payload = (await response.json().catch(() => null)) as
       | { error?: { message?: string } | string }
       | null;

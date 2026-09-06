@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { track } from "@/lib/analytics";
 import type { Credential } from "@/types/credential";
 
 interface Props {
@@ -5,6 +7,16 @@ interface Props {
 }
 
 const SkillPassport = ({ credentials }: Props) => {
+  const trackedCredentials = useRef(new Set<string>());
+
+  useEffect(() => {
+    credentials.forEach((credential) => {
+      if (trackedCredentials.current.has(credential.credentialId)) return;
+      trackedCredentials.current.add(credential.credentialId);
+      track("credential_viewed", { status: credential.status });
+    });
+  }, [credentials]);
+
   return (
     <div className="glass-effect rounded-2xl p-6">
       <h3 className="text-2xl font-bold text-neon">Skill Passport</h3>

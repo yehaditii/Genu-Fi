@@ -111,7 +111,8 @@ VERIFICATION_CONTRACT_ID=<verification-testnet-id>
 ## Frontend
 
 - Deploy `frontend/` to Vercel
-- Configure `VITE_API_URL`, `VITE_EVENTS_WS_URL`, `VITE_STELLAR_NETWORK`, and contract IDs from `frontend/.env.example`
+- Configure `VITE_API_URL`, `VITE_EVENTS_WS_URL`, `VITE_STELLAR_NETWORK`, contract IDs, and optional Plausible analytics variables from `frontend/.env.example`
+- Enable analytics only with `VITE_ANALYTICS_ENABLED=true` and the deployed hostname in `VITE_PLAUSIBLE_DOMAIN`
 - `VITE_API_URL` must point to the deployed backend API, including the `/api` path
 - `VITE_EVENTS_WS_URL` must point to the deployed backend WebSocket endpoint
 - The existing `frontend/vercel.json` SPA rewrite is compatible with the separate backend architecture

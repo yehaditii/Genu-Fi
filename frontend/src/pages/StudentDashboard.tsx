@@ -48,14 +48,15 @@ const StudentDashboard = () => {
         <div className="container mx-auto space-y-8">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-soft-neon/60">Student Dashboard</p>
-            <h1 className="mt-2 text-4xl font-bold text-neon">Verifiable Skill Passport</h1>
+            <h1 className="dashboard-heading mt-2 text-3xl font-bold text-neon sm:text-4xl">Verifiable Skill Passport</h1>
+            <p className="mt-3 text-sm text-soft-neon/70">Wallet: {publicKey ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : "Not connected"} · Network: Stellar TESTNET</p>
           </div>
           {!isConnected ? (
             <div className="glass-effect rounded-2xl p-6"><p className="text-soft-neon/80">Connect your Stellar wallet to load your on-chain passport.</p><button className="btn-primary mt-4" type="button" onClick={() => void connectWallet()}>Connect wallet</button></div>
           ) : isLoading ? (
-            <div className="flex justify-center py-12"><LoadingSpinner /></div>
+            <div className="glass-effect rounded-2xl p-6" aria-live="polite"><div className="skeleton h-7 w-48" /><div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="skeleton h-16" /><div className="skeleton h-16" /><div className="skeleton h-16" /></div><div className="mt-6 flex justify-center"><LoadingSpinner /></div><p className="mt-4 text-center text-sm text-soft-neon/70">Reading your credentials from Stellar Testnet...</p></div>
           ) : error ? (
-            <div className="glass-effect rounded-2xl p-6 text-red-300">{error}</div>
+            <div role="alert" className="status-panel status-panel-error">{error}</div>
           ) : (
             <>
               {reputation && <ReputationScore score={reputation} />}

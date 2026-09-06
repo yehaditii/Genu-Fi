@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const { WebSocketServer } = require("ws");
 const { env, validateEnvironment } = require("./config/env");
+const { captureError, initMonitoring } = require("./services/monitoring");
 const { connectDatabase } = require("./config/database");
 const { errorHandler } = require("./middleware/errorHandler");
 const institutionsRouter = require("./routes/institutions");
@@ -11,6 +12,8 @@ const reputationRouter = require("./routes/reputation");
 const verificationRouter = require("./routes/verification");
 const eventsRouter = require("./routes/events");
 const { setWebSocketServer, startPolling } = require("./services/eventService");
+
+initMonitoring();
 
 const app = express();
 const server = http.createServer(app);
@@ -47,8 +50,14 @@ app.use(errorHandler);
 const port = env.port;
 
 async function start() {
-  validateEnvironment();
+  try {
+    validateEnvironment();
+  } catch (error) {
+    captureError(error, { category: "configuration_failure", operation: "startup" });
+    throw error;
+  }
   await connectDatabase().catch((error) => {
+    captureError(error, { category: "database_failure", operation: "connect" });
     console.warn("Database connection skipped:", error.message);
   });
 
@@ -58,6 +67,16 @@ async function start() {
     console.log(`GenuFi backend listening on ${port}`);
   });
 }
+
+process.on("uncaughtException", (error) => {
+  captureError(error, { category: "uncaught_exception" });
+  console.error("Unhandled backend exception.");
+});
+
+process.on("unhandledRejection", (reason) => {
+  captureError(reason, { category: "unhandled_rejection" });
+  console.error("Unhandled backend rejection.");
+});
 
 if (require.main === module) {
   start();

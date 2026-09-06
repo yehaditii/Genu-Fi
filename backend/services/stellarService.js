@@ -1,5 +1,6 @@
 const { contract, rpc, TransactionBuilder } = require("@stellar/stellar-sdk");
 const { env } = require("../config/env");
+const { captureError } = require("./monitoring");
 
 function server() {
   return new rpc.Server(env.stellarRpcUrl);
@@ -86,29 +87,27 @@ async function prepareCredentialIssuance(payload) {
 }
 
 async function getCredential(credentialId, sourceAddress) {
-  const credentialClient = await client(
-    env.credentialRegistryId,
-    sourceAddress,
-    "credential-registry"
-  );
-  const transaction = await credentialClient.get_credential({
-    credential_id: credentialIdValue(credentialId),
-  });
-  const { result } = await transaction.simulate();
-  return serializeValue(result);
+  try {
+    const credentialClient = await client(env.credentialRegistryId, sourceAddress, "credential-registry");
+    const transaction = await credentialClient.get_credential({ credential_id: credentialIdValue(credentialId) });
+    const { result } = await transaction.simulate();
+    return serializeValue(result);
+  } catch (error) {
+    captureError(error, { category: "stellar_rpc_failure", operation: "get_credential" });
+    throw error;
+  }
 }
 
 async function getCredentialValidity(credentialId, sourceAddress) {
-  const credentialClient = await client(
-    env.credentialRegistryId,
-    sourceAddress,
-    "credential-registry"
-  );
-  const transaction = await credentialClient.is_valid({
-    credential_id: credentialIdValue(credentialId),
-  });
-  const { result } = await transaction.simulate();
-  return Boolean(result);
+  try {
+    const credentialClient = await client(env.credentialRegistryId, sourceAddress, "credential-registry");
+    const transaction = await credentialClient.is_valid({ credential_id: credentialIdValue(credentialId) });
+    const { result } = await transaction.simulate();
+    return Boolean(result);
+  } catch (error) {
+    captureError(error, { category: "stellar_rpc_failure", operation: "get_credential_validity" });
+    throw error;
+  }
 }
 
 async function prepareVerification(payload) {
@@ -136,22 +135,22 @@ async function prepareVerification(payload) {
 }
 
 async function getVerification(credentialId, sourceAddress) {
-  const verificationClient = await client(
-    env.verificationContractId,
-    sourceAddress,
-    "verification"
-  );
-  const transaction = await verificationClient.get_verification({
-    credential_id: credentialIdValue(credentialId),
-  });
-  const { result } = await transaction.simulate();
-  return serializeValue(result);
+  try {
+    const verificationClient = await client(env.verificationContractId, sourceAddress, "verification");
+    const transaction = await verificationClient.get_verification({ credential_id: credentialIdValue(credentialId) });
+    const { result } = await transaction.simulate();
+    return serializeValue(result);
+  } catch (error) {
+    captureError(error, { category: "stellar_rpc_failure", operation: "get_verification" });
+    throw error;
+  }
 }
 
 async function submitTransaction(signedTransactionXdr) {
-  if (!signedTransactionXdr) {
-    throw serviceError("signedTransactionXdr is required.");
-  }
+  try {
+    if (!signedTransactionXdr) {
+      throw serviceError("signedTransactionXdr is required.");
+    }
 
   let transaction;
   try {
@@ -181,12 +180,16 @@ async function submitTransaction(signedTransactionXdr) {
     );
   }
 
-  return {
-    txHash: submitted.hash,
-    status: confirmed.status,
-    ledger: confirmed.ledger,
-    network: "TESTNET",
-  };
+    return {
+      txHash: submitted.hash,
+      status: confirmed.status,
+      ledger: confirmed.ledger,
+      network: "TESTNET",
+    };
+  } catch (error) {
+    captureError(error, { category: "stellar_rpc_failure", operation: "submit_transaction" });
+    throw error;
+  }
 }
 
 async function issueCredential(payload) {
@@ -198,11 +201,16 @@ async function verifyCredential(payload) {
 }
 
 async function getReputationScore(userAddress, sourceAddress = userAddress) {
-  requireAddress(userAddress, "userAddress");
-  const reputationClient = await client(env.reputationContractId, sourceAddress, "reputation");
-  const transaction = await reputationClient.get_score({ user: userAddress });
-  const { result } = await transaction.simulate();
-  return { userAddress, totalScore: Number(result || 0) };
+  try {
+    requireAddress(userAddress, "userAddress");
+    const reputationClient = await client(env.reputationContractId, sourceAddress, "reputation");
+    const transaction = await reputationClient.get_score({ user: userAddress });
+    const { result } = await transaction.simulate();
+    return { userAddress, totalScore: Number(result || 0) };
+  } catch (error) {
+    captureError(error, { category: "stellar_rpc_failure", operation: "get_reputation" });
+    throw error;
+  }
 }
 
 async function registerInstitution(_payload) {

@@ -1,4 +1,5 @@
 const { env } = require("../config/env");
+const { captureError } = require("../services/monitoring");
 
 function errorHandler(err, _req, res, _next) {
   const statusCode = Number.isInteger(err.statusCode) ? err.statusCode : 500;
@@ -8,7 +9,10 @@ function errorHandler(err, _req, res, _next) {
       ? "Internal server error"
       : err.message || "Request failed";
 
-  console.error(err.stack || err);
+  if (statusCode >= 500) {
+    captureError(err, { category: "api_failure", status: statusCode, error_code: code });
+  }
+  console.error(statusCode >= 500 ? "Unhandled API error." : "Handled API error.");
   res.status(statusCode).json({
     success: false,
     error: { code, message },

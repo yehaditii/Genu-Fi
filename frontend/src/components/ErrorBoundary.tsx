@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { captureError } from "@/lib/monitoring";
 
 interface Props {
   children: ReactNode;
@@ -18,7 +19,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("GenuFi UI error", error, errorInfo);
+    captureError(error, { category: "react_render_error", component_stack_present: Boolean(errorInfo.componentStack) });
   }
 
   public render() {

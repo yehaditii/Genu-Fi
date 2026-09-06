@@ -6,6 +6,9 @@ export const frontendEnv = {
   apiUrl: normalizeUrl(
     import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000/api" : "")
   ),
+  analyticsEnabled: import.meta.env.VITE_ANALYTICS_ENABLED === "true",
+  plausibleDomain: import.meta.env.VITE_PLAUSIBLE_DOMAIN || "",
+  plausibleScriptUrl: import.meta.env.VITE_PLAUSIBLE_SCRIPT_URL || "https://plausible.io/js/script.js",
   eventsWsUrl: import.meta.env.VITE_EVENTS_WS_URL || "",
   stellarNetwork: import.meta.env.VITE_STELLAR_NETWORK || "TESTNET",
   stellarNetworkPassphrase:

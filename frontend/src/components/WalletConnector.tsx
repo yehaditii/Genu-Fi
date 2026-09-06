@@ -19,11 +19,12 @@ const WalletConnector = () => {
   };
 
   return isConnected ? (
-    <div className="flex items-center gap-3">
-      <span className="rounded-full border border-aqua-neon/40 px-3 py-2 text-sm text-soft-neon">
-        {publicKey?.slice(0, 6)}...{publicKey?.slice(-4)}
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 px-3 py-2 text-sm text-soft-neon" title={publicKey || undefined}>
+        <span className="h-2 w-2 rounded-full bg-emerald-300" aria-hidden="true" />
+        <span>Connected: {publicKey?.slice(0, 6)}...{publicKey?.slice(-4)}</span>
       </span>
-      <button className="btn-secondary" onClick={disconnectWallet}>
+      <button className="btn-secondary" onClick={disconnectWallet} aria-label="Disconnect Stellar wallet">
         Disconnect
       </button>
     </div>

@@ -8,6 +8,8 @@ import {
 } from "react";
 import { isConnected, requestAccess, signTransaction as freighterSignTransaction } from "@stellar/freighter-api";
 import { frontendEnv } from "@/config/env";
+import { track } from "@/lib/analytics";
+import { captureError } from "@/lib/monitoring";
 import type { WalletState } from "@/types/stellar";
 
 interface StellarContextValue extends WalletState {
@@ -23,23 +25,31 @@ export function StellarProvider({ children }: PropsWithChildren) {
   const network = frontendEnv.stellarNetwork;
 
   const connectWallet = useCallback(async () => {
-    const connection = await isConnected();
-    if (connection.isConnected && connection.publicKey) {
-      setPublicKey(connection.publicKey);
-      return;
-    }
+    try {
+      const connection = await isConnected();
+      if (connection.isConnected && connection.publicKey) {
+        setPublicKey(connection.publicKey);
+        track("wallet_connected", { network: frontendEnv.stellarNetwork });
+        return;
+      }
 
-    const result = await requestAccess();
-    if ("address" in result && result.address) {
-      setPublicKey(result.address);
-      return;
-    }
+      const result = await requestAccess();
+      if ("address" in result && result.address) {
+        setPublicKey(result.address);
+        track("wallet_connected", { network: frontendEnv.stellarNetwork });
+        return;
+      }
 
-    throw new Error("Freighter wallet access was not granted.");
+      throw new Error("Freighter wallet access was not granted.");
+    } catch (error) {
+      captureError(error, { category: "wallet_error", operation: "connect" });
+      throw error;
+    }
   }, []);
 
   const disconnectWallet = useCallback(() => {
     setPublicKey(null);
+    track("wallet_disconnected", { network: frontendEnv.stellarNetwork });
   }, []);
 
   const signTransaction = useCallback(
@@ -47,14 +57,19 @@ export function StellarProvider({ children }: PropsWithChildren) {
       if (!publicKey) {
         throw new Error("Connect a Freighter wallet before signing.");
       }
-      const result = await freighterSignTransaction(xdr, {
-        address: publicKey,
-        networkPassphrase: frontendEnv.stellarNetworkPassphrase,
-      });
-      if (result.error || !result.signedTxXdr) {
-        throw new Error(result.error?.message || "Freighter did not sign the transaction.");
+      try {
+        const result = await freighterSignTransaction(xdr, {
+          address: publicKey,
+          networkPassphrase: frontendEnv.stellarNetworkPassphrase,
+        });
+        if (result.error || !result.signedTxXdr) {
+          throw new Error(result.error?.message || "Freighter did not sign the transaction.");
+        }
+        return result.signedTxXdr;
+      } catch (error) {
+        captureError(error, { category: "wallet_error", operation: "sign_transaction" });
+        throw error;
       }
-      return result.signedTxXdr;
     },
     [publicKey]
   );
