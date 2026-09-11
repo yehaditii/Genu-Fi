@@ -45,18 +45,30 @@ const StudentDashboard = () => {
     <div className="min-h-screen">
       <Header />
       <main className="section-padding">
-        <div className="container mx-auto space-y-8">
+        <div className="container mx-auto space-y-6 sm:space-y-8">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-soft-neon/60">Student Dashboard</p>
-            <h1 className="dashboard-heading mt-2 text-3xl font-bold text-neon sm:text-4xl">Verifiable Skill Passport</h1>
-            <p className="mt-3 text-sm text-soft-neon/70">Wallet: {publicKey ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : "Not connected"} · Network: Stellar TESTNET</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-soft-neon/60 sm:text-sm">Student Dashboard</p>
+            <h1 className="dashboard-heading mt-1.5 text-2xl font-bold text-neon sm:mt-2 sm:text-3xl lg:text-4xl">Verifiable Skill Passport</h1>
+            <p className="mt-2 text-xs text-soft-neon/70 sm:mt-3 sm:text-sm">Wallet: {publicKey ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : "Not connected"} · Network: Stellar TESTNET</p>
           </div>
           {!isConnected ? (
-            <div className="glass-effect rounded-2xl p-6"><p className="text-soft-neon/80">Connect your Stellar wallet to load your on-chain passport.</p><button className="btn-primary mt-4" type="button" onClick={() => void connectWallet()}>Connect wallet</button></div>
+            <div className="glass-effect rounded-2xl p-4 sm:p-6">
+              <p className="text-xs text-soft-neon/80 sm:text-sm">Connect your Stellar wallet to load your on-chain passport.</p>
+              <button className="btn-primary mt-3 w-full text-xs sm:mt-4 sm:w-auto sm:text-sm" type="button" onClick={() => void connectWallet()}>Connect wallet</button>
+            </div>
           ) : isLoading ? (
-            <div className="glass-effect rounded-2xl p-6" aria-live="polite"><div className="skeleton h-7 w-48" /><div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="skeleton h-16" /><div className="skeleton h-16" /><div className="skeleton h-16" /></div><div className="mt-6 flex justify-center"><LoadingSpinner /></div><p className="mt-4 text-center text-sm text-soft-neon/70">Reading your credentials from Stellar Testnet...</p></div>
+            <div className="glass-effect rounded-2xl p-4 sm:p-6" aria-live="polite">
+              <div className="skeleton h-6 w-36 sm:h-7 sm:w-48" />
+              <div className="mt-4 grid gap-2.5 sm:mt-6 sm:grid-cols-3 sm:gap-3">
+                <div className="skeleton h-14 sm:h-16" />
+                <div className="skeleton h-14 sm:h-16" />
+                <div className="skeleton h-14 sm:h-16" />
+              </div>
+              <div className="mt-6 flex justify-center"><LoadingSpinner /></div>
+              <p className="mt-4 text-center text-xs text-soft-neon/70 sm:text-sm">Reading your credentials from Stellar Testnet...</p>
+            </div>
           ) : error ? (
-            <div role="alert" className="status-panel status-panel-error">{error}</div>
+            <div role="alert" className="status-panel status-panel-error text-xs sm:text-sm">{error}</div>
           ) : (
             <>
               {reputation && <ReputationScore score={reputation} />}

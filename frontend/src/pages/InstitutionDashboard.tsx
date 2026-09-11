@@ -81,26 +81,26 @@ const InstitutionDashboard = () => {
     <div className="min-h-screen">
       <Header />
       <main className="section-padding">
-        <div className="container mx-auto space-y-8">
+        <div className="container mx-auto space-y-6 sm:space-y-8">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-soft-neon/60">Institution Dashboard</p>
-            <h1 className="dashboard-heading mt-2 text-3xl font-bold text-neon sm:text-4xl">Issue and Manage Credentials</h1>
-            <p className="mt-3 text-sm text-soft-neon/70">Network: Stellar {"TESTNET"} · Issuer wallet: {publicKey ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : "Not connected"}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-soft-neon/60 sm:text-sm">Institution Dashboard</p>
+            <h1 className="dashboard-heading mt-1.5 text-2xl font-bold text-neon sm:mt-2 sm:text-3xl lg:text-4xl">Issue and Manage Credentials</h1>
+            <p className="mt-2 text-xs text-soft-neon/70 sm:mt-3 sm:text-sm">Network: Stellar {"TESTNET"} · Issuer wallet: {publicKey ? `${publicKey.slice(0, 6)}...${publicKey.slice(-4)}` : "Not connected"}</p>
           </div>
           <InstitutionCard name="Connected issuer" type="Stellar institution" isVerified={false} />
-          <div className="glass-effect rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-neon">Issue Credential</h2>
-            <p className="mt-2 text-sm text-soft-neon/70">The connected wallet signs the credential transaction.</p>
-            <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={issueCredential} noValidate>
-              <label className="grid gap-2 text-sm text-soft-neon/80">Candidate wallet address<input required value={recipientAddress} onChange={(event) => setRecipientAddress(event.target.value.trim())} className="form-control" placeholder="G..." aria-label="Recipient Stellar address" /></label>
-              <label className="grid gap-2 text-sm text-soft-neon/80">Credential or skill type<input required value={credentialType} onChange={(event) => setCredentialType(event.target.value)} className="form-control" placeholder="Course completion" aria-label="Credential or skill type" /></label>
-              <label className="grid gap-2 text-sm text-soft-neon/80 md:col-span-2">Credential metadata<textarea required value={metadata} onChange={(event) => setMetadata(event.target.value)} className="form-control" placeholder="Metadata URI or credential description" aria-label="Metadata URI or credential description" rows={4} /></label>
-              <button className="btn-primary md:w-fit" type="submit" disabled={state === "preparing" || state === "awaiting_signature" || state === "confirming"}>{state === "preparing" || state === "confirming" ? "Processing..." : "Submit Soroban Issuance"}</button>
+          <div className="glass-effect rounded-2xl p-4 sm:p-6">
+            <h2 className="text-xl font-bold text-neon sm:text-2xl">Issue Credential</h2>
+            <p className="mt-1.5 text-xs text-soft-neon/70 sm:mt-2 sm:text-sm">The connected wallet signs the credential transaction.</p>
+            <form className="mt-5 grid gap-4 md:grid-cols-2 sm:mt-6" onSubmit={issueCredential} noValidate>
+              <label className="grid gap-1.5 text-xs text-soft-neon/80 sm:text-sm">Candidate wallet address<input required value={recipientAddress} onChange={(event) => setRecipientAddress(event.target.value.trim())} className="form-control text-base sm:text-sm" placeholder="G..." aria-label="Recipient Stellar address" /></label>
+              <label className="grid gap-1.5 text-xs text-soft-neon/80 sm:text-sm">Credential or skill type<input required value={credentialType} onChange={(event) => setCredentialType(event.target.value)} className="form-control text-base sm:text-sm" placeholder="Course completion" aria-label="Credential or skill type" /></label>
+              <label className="grid gap-1.5 text-xs text-soft-neon/80 md:col-span-2 sm:text-sm">Credential metadata<textarea required value={metadata} onChange={(event) => setMetadata(event.target.value)} className="form-control resize-none text-base sm:text-sm" placeholder="Metadata URI or credential description" aria-label="Metadata URI or credential description" rows={4} /></label>
+              <button className="btn-primary w-full md:w-fit" type="submit" disabled={state === "preparing" || state === "awaiting_signature" || state === "confirming"}>{state === "preparing" || state === "confirming" ? "Processing..." : "Submit Soroban Issuance"}</button>
             </form>
-            {!isConnected && <button className="btn-secondary mt-4" type="button" onClick={() => void connectWallet()}>Connect issuing wallet</button>}
-            {statusMessage && <p aria-live="polite" className={`status-panel mt-4 ${state === "error" ? "status-panel-error" : state === "success" ? "status-panel-success" : "status-panel-info"}`}>{statusMessage}</p>}
-            {error && <p role="alert" className="status-panel status-panel-error mt-2 break-words">{error}</p>}
-            {result && <div aria-live="polite" className="status-panel status-panel-success mt-4"><p>Credential ID: {result.credentialId}</p><p className="mt-1 break-all">Transaction hash: {result.txHash}</p><p className="mt-2 text-xs uppercase">Confirmed on Stellar Testnet</p></div>}
+            {!isConnected && <button className="btn-secondary mt-4 w-full sm:w-auto" type="button" onClick={() => void connectWallet()}>Connect issuing wallet</button>}
+            {statusMessage && <p aria-live="polite" className={`status-panel mt-4 text-xs sm:text-sm ${state === "error" ? "status-panel-error" : state === "success" ? "status-panel-success" : "status-panel-info"}`}>{statusMessage}</p>}
+            {error && <p role="alert" className="status-panel status-panel-error mt-2 break-words text-xs sm:text-sm">{error}</p>}
+            {result && <div aria-live="polite" className="status-panel status-panel-success mt-4 text-xs sm:text-sm"><p className="break-all">Credential ID: {result.credentialId}</p><p className="mt-1 break-all font-mono">Transaction hash: {result.txHash}</p><p className="mt-2 text-xs uppercase">Confirmed on Stellar Testnet</p></div>}
           </div>
         </div>
       </main>

@@ -18,22 +18,22 @@ const SkillPassport = ({ credentials }: Props) => {
   }, [credentials]);
 
   return (
-    <div className="glass-effect rounded-2xl p-6">
-      <h3 className="text-2xl font-bold text-neon">Skill Passport</h3>
-      <div className="mt-6 space-y-4">
-        {credentials.length === 0 && <p className="text-soft-neon/70">No credentials have been issued to this wallet yet.</p>}
+    <div className="glass-effect rounded-2xl p-4 sm:p-6">
+      <h3 className="text-xl font-bold text-neon sm:text-2xl">Skill Passport</h3>
+      <div className="mt-4 space-y-3 sm:mt-6 sm:space-y-4">
+        {credentials.length === 0 && <p className="text-sm text-soft-neon/70">No credentials have been issued to this wallet yet.</p>}
         {credentials.map((credential) => (
-          <div key={credential.credentialId} className="rounded-xl border border-aqua-neon/20 p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-semibold text-soft-neon">{credential.credentialType}</p>
-                <p className="text-sm text-soft-neon/60">Credential ID: {credential.credentialId}</p>
-                <p className="text-sm text-soft-neon/60">{credential.metadata}</p>
-                <p className="text-xs text-soft-neon/50">Issuer: {credential.issuerAddress || credential.issuer}</p>
-                {credential.transactionHash && <p className="mt-1 break-all text-xs text-soft-neon/50">Transaction: {credential.transactionHash}</p>}
-                <p className="mt-1 text-xs uppercase text-soft-neon/60">Verification: {credential.verificationStatus?.replace("_", " ") || "not available"}</p>
+          <div key={credential.credentialId} className="rounded-xl border border-aqua-neon/20 p-3.5 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="font-semibold text-soft-neon text-base">{credential.credentialType}</p>
+                <p className="break-all text-xs text-soft-neon/60 sm:text-sm">Credential ID: {credential.credentialId}</p>
+                {credential.metadata && <p className="break-words text-xs text-soft-neon/70 sm:text-sm">{credential.metadata}</p>}
+                <p className="break-all font-mono text-[11px] text-soft-neon/50 sm:text-xs">Issuer: {credential.issuerAddress || credential.issuer}</p>
+                {credential.transactionHash && <p className="break-all font-mono text-[11px] text-soft-neon/50 sm:text-xs">Transaction: {credential.transactionHash}</p>}
+                <p className="text-[11px] uppercase tracking-wide text-soft-neon/60 sm:text-xs">Verification: {credential.verificationStatus?.replace("_", " ") || "not available"}</p>
               </div>
-              <span className="text-sm uppercase text-aqua-neon">{credential.status}</span>
+              <span className="self-start sm:self-auto shrink-0 rounded-full border border-aqua-neon/30 bg-aqua-neon/10 px-2.5 py-1 text-xs font-semibold uppercase text-aqua-neon">{credential.status}</span>
             </div>
           </div>
         ))}

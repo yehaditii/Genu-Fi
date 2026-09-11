@@ -4,14 +4,14 @@ const Partners = () => {
   return (
     <section className="section-padding">
       <div className="container mx-auto text-center">
-        <h2 className="mb-16 text-4xl font-bold lg:text-5xl">
+        <h2 className="mb-8 text-3xl font-bold sm:mb-16 sm:text-4xl lg:text-5xl">
           <span className="gradient-text">Trusted Participants</span>
         </h2>
 
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-4">
           {partners.map((partner) => (
-            <div key={partner} className="glass-effect rounded-xl p-6">
-              <div className="text-2xl font-bold text-aqua-neon">{partner}</div>
+            <div key={partner} className="glass-effect rounded-xl p-4 sm:p-6">
+              <div className="text-base font-bold text-aqua-neon sm:text-2xl">{partner}</div>
             </div>
           ))}
         </div>

@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply bg-deep-navy font-poppins text-soft-neon;
+    @apply bg-deep-navy font-poppins text-soft-neon overflow-x-hidden min-h-screen;
     background: linear-gradient(135deg, #001c30 0%, #0a2a4a 100%);
   }
 
@@ -73,15 +73,15 @@
   }
 
   .btn-primary {
-    @apply inline-flex min-h-12 items-center justify-center rounded-xl bg-aqua-neon px-6 py-3 text-center font-semibold text-deep-navy transition hover:scale-[1.02] hover:bg-[#7adbd5] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100;
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl bg-aqua-neon px-5 py-3 text-center text-sm sm:text-base font-semibold text-deep-navy transition hover:scale-[1.02] hover:bg-[#7adbd5] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100;
   }
 
   .btn-secondary {
-    @apply inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-aqua-neon px-6 py-3 text-center font-semibold text-aqua-neon transition hover:bg-aqua-neon hover:text-deep-navy disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-aqua-neon;
+    @apply inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-aqua-neon px-5 py-3 text-center text-sm sm:text-base font-semibold text-aqua-neon transition hover:bg-aqua-neon hover:text-deep-navy disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-aqua-neon;
   }
 
   .section-padding {
-    @apply px-4 py-12 sm:px-6 sm:py-16 lg:px-12 lg:py-20;
+    @apply px-3 py-10 sm:px-6 sm:py-16 lg:px-12 lg:py-20;
   }
 
   .dashboard-heading {
@@ -89,7 +89,7 @@
   }
 
   .form-control {
-    @apply min-h-12 w-full rounded-xl border border-aqua-neon/20 bg-deep-navy/50 px-4 py-3 text-soft-neon transition placeholder:text-soft-neon/50 focus:border-aqua-neon focus:bg-deep-navy/70;
+    @apply min-h-12 w-full rounded-xl border border-aqua-neon/20 bg-deep-navy/50 px-4 py-3 text-base sm:text-sm text-soft-neon transition placeholder:text-soft-neon/50 focus:border-aqua-neon focus:bg-deep-navy/70;
   }
 
   .status-panel {

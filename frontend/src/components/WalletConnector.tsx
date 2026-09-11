@@ -19,21 +19,34 @@ const WalletConnector = () => {
   };
 
   return isConnected ? (
-    <div className="flex flex-wrap items-center gap-3">
-      <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 px-3 py-2 text-sm text-soft-neon" title={publicKey || undefined}>
+    <div className="flex w-full flex-col sm:w-auto sm:flex-row sm:items-center gap-2 sm:gap-3">
+      <span
+        className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/10 px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-soft-neon"
+        title={publicKey || undefined}
+      >
         <span className="h-2 w-2 rounded-full bg-emerald-300" aria-hidden="true" />
-        <span>Connected: {publicKey?.slice(0, 6)}...{publicKey?.slice(-4)}</span>
+        <span className="font-mono">
+          {publicKey?.slice(0, 4)}...{publicKey?.slice(-4)}
+        </span>
       </span>
-      <button className="btn-secondary" onClick={disconnectWallet} aria-label="Disconnect Stellar wallet">
+      <button
+        className="btn-secondary min-h-10 px-3 py-1.5 text-xs sm:text-sm w-full sm:w-auto"
+        onClick={disconnectWallet}
+        aria-label="Disconnect Stellar wallet"
+      >
         Disconnect
       </button>
     </div>
   ) : (
-    <div>
-      <button className="btn-primary" onClick={() => void handleConnect()} disabled={isConnecting}>
+    <div className="w-full sm:w-auto">
+      <button
+        className="btn-primary min-h-10 px-4 py-2 text-xs sm:text-sm w-full sm:w-auto"
+        onClick={() => void handleConnect()}
+        disabled={isConnecting}
+      >
         {isConnecting ? "Connecting..." : "Connect Freighter"}
       </button>
-      {error && <p className="mt-2 max-w-xs text-xs text-red-300">{error}</p>}
+      {error && <p className="mt-2 max-w-xs break-words text-xs text-red-300">{error}</p>}
     </div>
   );
 };

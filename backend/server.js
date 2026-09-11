@@ -11,6 +11,7 @@ const credentialsRouter = require("./routes/credentials");
 const reputationRouter = require("./routes/reputation");
 const verificationRouter = require("./routes/verification");
 const eventsRouter = require("./routes/events");
+const feedbackRouter = require("./routes/feedback");
 const { setWebSocketServer, startPolling } = require("./services/eventService");
 
 initMonitoring();
@@ -44,6 +45,7 @@ app.use("/api/credentials", credentialsRouter);
 app.use("/api/reputation", reputationRouter);
 app.use("/api/verification", verificationRouter);
 app.use("/api/events", eventsRouter);
+app.use("/api/feedback", feedbackRouter);
 
 app.use(errorHandler);
 
