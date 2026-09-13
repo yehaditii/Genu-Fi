@@ -201,11 +201,17 @@ export default function FeedbackModal({
                   Overall Rating <span className="text-aqua-neon">*</span>
                 </label>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 sm:mt-2 sm:gap-2">
-                  <div className="flex items-center gap-1">
+                  <div
+                    className="flex items-center gap-1"
+                    role="radiogroup"
+                    aria-label="Overall rating"
+                  >
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         type="button"
+                        role="radio"
+                        aria-checked={rating === star}
                         onClick={() => setRating(star)}
                         onMouseEnter={() => setHoverRating(star)}
                         onMouseLeave={() => setHoverRating(0)}

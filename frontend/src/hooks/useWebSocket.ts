@@ -27,6 +27,7 @@ export function useWebSocket(url?: string) {
     let socket: WebSocket | null = null;
     let cancelled = false;
     let reconnectTimer: number | undefined;
+    let hasOpened = false;
 
     setIsLoading(true);
     setIsReconnecting(false);
@@ -35,15 +36,15 @@ export function useWebSocket(url?: string) {
     const connect = () => {
       if (cancelled) return;
 
-      setIsLoading(() => !isReconnecting);
-      setIsReconnecting(() => !isConnected);
-
+      setIsLoading(!hasOpened);
+      setIsReconnecting(hasOpened);
 
       try {
         socket = new WebSocket(url);
 
         socket.onopen = () => {
           if (cancelled) return;
+          hasOpened = true;
           setIsConnected(true);
           setIsLoading(false);
           setIsReconnecting(false);

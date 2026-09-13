@@ -27,13 +27,17 @@ export function StellarProvider({ children }: PropsWithChildren) {
   const connectWallet = useCallback(async () => {
     try {
       const connection = await isConnected();
-      if (connection.isConnected && connection.publicKey) {
-        setPublicKey(connection.publicKey);
-        track("wallet_connected", { network: frontendEnv.stellarNetwork });
-        return;
+      if (connection.error) {
+        throw new Error(connection.error.message || "Freighter wallet is not available.");
+      }
+      if (!connection.isConnected) {
+        throw new Error("Freighter wallet is not connected.");
       }
 
       const result = await requestAccess();
+      if (result.error) {
+        throw new Error(result.error.message || "Freighter wallet access was not granted.");
+      }
       if ("address" in result && result.address) {
         setPublicKey(result.address);
         track("wallet_connected", { network: frontendEnv.stellarNetwork });

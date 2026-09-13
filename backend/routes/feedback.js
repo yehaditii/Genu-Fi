@@ -6,6 +6,13 @@ const router = express.Router();
 const STELLAR_ADDRESS_REGEX = /^G[A-Z0-9]{55}$/;
 const MAX_FEEDBACK_LENGTH = 2000;
 
+function sendError(res, statusCode, code, message) {
+  return res.status(statusCode).json({
+    success: false,
+    error: { code, message },
+  });
+}
+
 function sanitizeString(str, maxLength = MAX_FEEDBACK_LENGTH) {
   if (typeof str !== "string") return "";
   return str.trim().slice(0, maxLength);
@@ -31,13 +38,7 @@ router.post("/", async (req, res, next) => {
 
     const rating = Number(rawRating);
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: "INVALID_RATING",
-          message: "Rating must be an integer between 1 and 5.",
-        },
-      });
+      return sendError(res, 400, "INVALID_RATING", "Rating must be an integer between 1 and 5.");
     }
 
     const liked = sanitizeString(rawLiked, MAX_FEEDBACK_LENGTH);
@@ -49,13 +50,12 @@ router.post("/", async (req, res, next) => {
     if (rawWalletAddress && typeof rawWalletAddress === "string" && rawWalletAddress.trim()) {
       const trimmedWallet = rawWalletAddress.trim();
       if (!isValidWalletAddress(trimmedWallet)) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: "INVALID_WALLET_ADDRESS",
-            message: "Provided wallet address is not a valid Stellar public key.",
-          },
-        });
+        return sendError(
+          res,
+          400,
+          "INVALID_WALLET_ADDRESS",
+          "Provided wallet address is not a valid Stellar public key."
+        );
       }
       walletAddress = trimmedWallet;
     }
@@ -67,13 +67,7 @@ router.post("/", async (req, res, next) => {
         createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) },
       });
       if (existingById) {
-        return res.status(409).json({
-          success: false,
-          error: {
-            code: "DUPLICATE_SUBMISSION",
-            message: "Feedback has already been submitted.",
-          },
-        });
+        return sendError(res, 409, "DUPLICATE_SUBMISSION", "Feedback has already been submitted.");
       }
     }
 
@@ -88,13 +82,12 @@ router.post("/", async (req, res, next) => {
     });
 
     if (recentDuplicate) {
-      return res.status(409).json({
-        success: false,
-        error: {
-          code: "DUPLICATE_SUBMISSION",
-          message: "Duplicate feedback submission detected. Please wait a moment.",
-        },
-      });
+      return sendError(
+        res,
+        409,
+        "DUPLICATE_SUBMISSION",
+        "Duplicate feedback submission detected. Please wait a moment."
+      );
     }
 
     const feedback = await Feedback.create({
@@ -120,6 +113,20 @@ router.post("/", async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (error?.code === 11000) {
+      return sendError(res, 409, "DUPLICATE_SUBMISSION", "Feedback has already been submitted.");
+    }
+
+    if (error?.name === "ValidationError") {
+      return sendError(res, 400, "INVALID_FEEDBACK", "Feedback input did not pass validation.");
+    }
+
+    if (["MongoServerError", "MongoNetworkError", "MongooseError"].includes(error?.name)) {
+      error.statusCode = 503;
+      error.code = "DATABASE_ERROR";
+      error.message = "Feedback could not be saved right now. Please try again shortly.";
+    }
+
     next(error);
   }
 });

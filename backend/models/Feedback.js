@@ -40,7 +40,6 @@ const feedbackSchema = new mongoose.Schema({
     trim: true,
     maxlength: [128, "Client submission ID cannot exceed 128 characters"],
     default: null,
-    index: true,
   },
   createdAt: {
     type: Date,
@@ -50,5 +49,13 @@ const feedbackSchema = new mongoose.Schema({
 });
 
 feedbackSchema.index({ walletAddress: 1, createdAt: -1 });
+feedbackSchema.index(
+  { clientSubmissionId: 1 },
+  {
+    unique: true,
+    sparse: true,
+    partialFilterExpression: { clientSubmissionId: { $type: "string" } },
+  }
+);
 
 module.exports = mongoose.model("Feedback", feedbackSchema);

@@ -157,9 +157,11 @@ describe("Feedback API", () => {
       expect(duplicateResponse.body.error.code).toBe("DUPLICATE_SUBMISSION");
     });
 
-    it("handles unexpected database errors properly", async () => {
+    it("handles database errors with a service-unavailable response", async () => {
       Feedback.create.mockImplementationOnce(async () => {
-        throw new Error("Database connection lost");
+        const error = new Error("Database connection lost");
+        error.name = "MongoNetworkError";
+        throw error;
       });
 
       const response = await request(app)
@@ -169,8 +171,30 @@ describe("Feedback API", () => {
           liked: "Great app",
         });
 
-      expect(response.statusCode).toBe(500);
+      expect(response.statusCode).toBe(503);
       expect(response.body.success).toBe(false);
+      expect(response.body.error.code).toBe("DATABASE_ERROR");
+    });
+
+    it("handles database duplicate key races as duplicate submissions", async () => {
+      Feedback.create.mockImplementationOnce(async () => {
+        const error = new Error("Duplicate key");
+        error.name = "MongoServerError";
+        error.code = 11000;
+        throw error;
+      });
+
+      const response = await request(app)
+        .post("/api/feedback")
+        .send({
+          rating: 5,
+          liked: "Great app",
+          clientSubmissionId: "race-submission-id",
+        });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.code).toBe("DUPLICATE_SUBMISSION");
     });
   });
 

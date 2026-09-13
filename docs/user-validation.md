@@ -1,73 +1,54 @@
-# User Validation & Feedback Log
+# User Validation Template
 
-This document provides the standardized framework and template for conducting, capturing, and summarizing real-world user validation testing sessions on GenuFi.
+Use this document to record real Genu-Fi user validation sessions. Do not fabricate, pre-fill, or infer user data. Leave fields blank or mark them `N/A` when they were not observed.
 
-> **Note on Data Integrity**: This template contains only unpopulated schemas and recording structures. Do not fabricate or pre-populate test data. Real feedback must be recorded during or immediately after live user testing sessions.
+## Session Metadata
 
----
+- **Date / Time**: `[YYYY-MM-DD HH:MM timezone]`
+- **Testing Environment**: `[Localhost / Stellar Testnet / Futurenet / Mainnet]`
+- **Facilitator**: `[Name or ID]`
+- **User Cohort**: `[Students / Institutions / Recruiters / Other]`
 
-## User Validation Session Template
+## Summary
 
-Use the following template for each validation batch or testing session.
-
-### Session Metadata
-- **Date / Time**: `YYYY-MM-DD HH:MM UTC`
-- **Testing Environment**: `[Stellar Testnet / Futurenet / Mainnet / Localhost]`
-- **Moderator / Facilitator**: `[Name or ID]`
-- **Target User Cohort**: `[Students / Academic Institutions / Recruiters / Web3 Developers]`
-
----
-
-### Summary Metrics
-| Metric | Value |
+| Field | Value |
 | :--- | :--- |
-| **Total Users Tested** | `[0]` |
-| **Total Wallet Interactions** | `[0]` |
-| **Successful Transactions** | `[0]` |
-| **Failed Transactions** | `[0]` |
-| **Average Rating (1–5)** | `[N/A]` |
+| Number of users | `[ ]` |
+| Wallet interactions | `[ ]` |
+| Feature used | `[ ]` |
+| Transaction hash | `[N/A or hash]` |
+| Average rating | `[N/A or 1-5]` |
+| Qualitative feedback | `[ ]` |
+| Improvements requested | `[ ]` |
 
----
+## User Interaction Log
 
-### Individual User Interaction Log
+| User # | Wallet interactions | Feature used | Transaction hash | Rating | Qualitative feedback | Improvements requested |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `[ ]` | `[Connected / Signed transaction / Viewed only / None]` | `[ ]` | `[N/A or Stellar transaction hash]` | `[1-5]` | `[What did the user like?]` | `[What should be improved?]` |
 
-| # | User Identifier | Wallet Interaction Type | Feature Used | Transaction Hash | Rating (1–5) | Qualitative Feedback (What worked well / liked) | Improvements Requested (Friction points / suggested changes) |
-| :-: | :--- | :--- | :--- | :--- | :-: | :--- | :--- |
-| 1 | `[User #1]` | `[Freighter Connected / Anonymous / Sign Tx]` | `[Skill Passport / Issue Credential / Verify Credential / Reputation Check / Activity Feed]` | `[Stellar Tx Hash or N/A]` | `[1-5]` | `[Record exact user observations]` | `[Record specific actionable improvements]` |
-| 2 | `[User #2]` | `[Freighter Connected / Anonymous / Sign Tx]` | `[Skill Passport / Issue Credential / Verify Credential / Reputation Check / Activity Feed]` | `[Stellar Tx Hash or N/A]` | `[1-5]` | `[Record exact user observations]` | `[Record specific actionable improvements]` |
-| 3 | `[User #3]` | `[Freighter Connected / Anonymous / Sign Tx]` | `[Skill Passport / Issue Credential / Verify Credential / Reputation Check / Activity Feed]` | `[Stellar Tx Hash or N/A]` | `[1-5]` | `[Record exact user observations]` | `[Record specific actionable improvements]` |
-| 4 | `[User #4]` | `[Freighter Connected / Anonymous / Sign Tx]` | `[Skill Passport / Issue Credential / Verify Credential / Reputation Check / Activity Feed]` | `[Stellar Tx Hash or N/A]` | `[1-5]` | `[Record exact user observations]` | `[Record specific actionable improvements]` |
-| 5 | `[User #5]` | `[Freighter Connected / Anonymous / Sign Tx]` | `[Skill Passport / Issue Credential / Verify Credential / Reputation Check / Activity Feed]` | `[Stellar Tx Hash or N/A]` | `[1-5]` | `[Record exact user observations]` | `[Record specific actionable improvements]` |
+## Detailed Participant Notes
 
----
-
-## Detailed Feedback Template per Participant
-
-Copy and fill this block for in-depth user interview notes:
+Copy this block once per real participant or validation group.
 
 ```markdown
-### Participant Log: [User ID / Alias]
-- **Number of Users Represented**: 1
-- **Wallet Interactions**:
-  - Wallet Type: [e.g. Freighter / Other / None]
-  - Wallet Connected: [Yes / No]
-  - Transactions Signed: [e.g. 0, 1, 2]
-- **Feature Used**: [e.g. Student Passport Loading, Institution Credential Issuance, Recruiter Verification, Live Events]
-- **Transaction Hash**: [e.g. Stellar Transaction Hash or N/A]
-- **Rating (1–5)**: [1 - Poor | 2 - Below Expectations | 3 - Good | 4 - Very Good | 5 - Excellent]
-- **Qualitative Feedback (What did you like?)**:
-  - 
-- **Improvements Requested (What should we improve?)**:
-  - 
-- **Follow-up Action Items**:
-  - [ ] 
+### Participant: [User number or alias]
+
+- Number of users represented: [1 or group size]
+- Wallet interactions: [Connected / Signed transaction / Viewed only / None]
+- Feature used: [Feature name]
+- Transaction hash: [N/A or Stellar transaction hash]
+- Rating: [1-5]
+- Qualitative feedback:
+  - [What did the user like?]
+- Improvements requested:
+  - [What should be improved?]
+- Follow-up actions:
+  - [ ] [Action item]
 ```
 
----
+## Privacy Rules
 
-## Data Collection & Privacy Policy
-
-When conducting validation sessions:
-1. **Never Collect Sensitive Credentials**: Never request or record private keys, seed phrases, recovery phrases, passwords, or payment card details.
-2. **Wallet Addresses**: Public Stellar addresses (`G...`) may be recorded only with user consent for transaction debugging and verifying on-chain activity.
-3. **Storage**: User feedback submitted through the application is persisted in the GenuFi MongoDB database under the `feedbacks` collection via the `/api/feedback` endpoint.
+- Never collect private keys, seed phrases, recovery phrases, passwords, payment details, or unnecessary personal information.
+- Record public wallet addresses or transaction hashes only when they are already available, appropriate for validation, and needed for debugging or verification.
+- User feedback submitted through the product is stored in the existing Genu-Fi backend database through the `/api/feedback` endpoint.
