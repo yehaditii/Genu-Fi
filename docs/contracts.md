@@ -1,46 +1,147 @@
-# Contracts
+# Stellar/Soroban Contracts
 
-The Soroban workspace contains four MVP packages. Each package has a small public interface and stores only the data it owns.
+The `contracts/` workspace contains four Soroban MVP contract packages. The repository includes contract code and tests, but it does not record deployed Testnet contract IDs.
+
+## Deployment Status
+
+| Contract | Package | Network | Contract ID in repo | Runtime env var |
+| :--- | :--- | :--- | :--- | :--- |
+| Institution Registry | `institution-registry` | Testnet intended | Not recorded | `INSTITUTION_REGISTRY_ID`, `VITE_INSTITUTION_REGISTRY_ID` |
+| Credential Registry | `credential-registry` | Testnet intended | Not recorded | `CREDENTIAL_REGISTRY_ID`, `VITE_CREDENTIAL_REGISTRY_ID` |
+| Reputation | `reputation` | Testnet intended | Not recorded | `REPUTATION_CONTRACT_ID`, `VITE_REPUTATION_CONTRACT_ID` |
+| Verification | `verification` | Testnet intended | Not recorded | `VERIFICATION_CONTRACT_ID`, `VITE_VERIFICATION_CONTRACT_ID` |
+
+Contract IDs must be produced by deployment and configured in the backend/frontend environments. Do not invent placeholder IDs for public materials.
 
 ## Institution Registry
 
-Methods:
+Purpose: register institution records and allow an admin to verify or revoke an institution.
 
-- `init_admin(admin)` initializes the administrator once.
-- `register_institution(name, wallet, metadata_uri)` registers an institution after wallet authorization.
-- `verify_institution(wallet)` and `revoke_institution(wallet)` are administrator-authorized state changes.
-- `get_institution(wallet)` and `is_verified(wallet)` retrieve institution state.
+Important methods:
 
-Storage is keyed by institution wallet, with an administrator and monotonic institution counter. Registration and admin initialization require the relevant address authorization.
+- `name() -> String`
+- `init_admin(admin)`
+- `register_institution(name, wallet, metadata_uri)`
+- `verify_institution(wallet)`
+- `revoke_institution(wallet)`
+- `get_institution(wallet) -> Option<Institution>`
+- `is_verified(wallet) -> bool`
+
+Authorization:
+
+- `init_admin` requires the admin address authorization and can be called only once.
+- `register_institution` requires the institution wallet authorization.
+- `verify_institution` and `revoke_institution` require the stored admin authorization.
+
+Stored data:
+
+- Institution name.
+- Institution wallet address.
+- Metadata URI.
+- Verification flag.
+- Registration timestamp.
 
 ## Credential Registry
 
-Methods:
+Purpose: issue, retrieve, validate, and revoke credential records.
 
-- `issue_credential(credential_id, issuer, recipient, credential_hash, credential_type, metadata_uri)` stores a credential after issuer authorization.
-- `get_credential(credential_id)` retrieves the credential.
-- `is_valid(credential_id)` returns false for missing or revoked credentials.
-- `revoke_credential(credential_id, issuer)` allows only the original issuer to revoke.
+Important methods:
 
-Storage is one persistent record per credential ID. The record contains issuer, recipient, hash, type, metadata URI, issue time, and revocation state. The recipient address is the candidate association; no separate ownership record is necessary for this MVP.
+- `name() -> String`
+- `issue_credential(credential_id, issuer, recipient, credential_hash, credential_type, metadata_uri)`
+- `get_credential(credential_id) -> Option<Credential>`
+- `is_valid(credential_id) -> bool`
+- `revoke_credential(credential_id, issuer)`
 
-## Verification
+Authorization:
 
-Methods:
+- `issue_credential` requires issuer authorization.
+- `revoke_credential` requires the original issuer authorization.
 
-- `record_verification(credential_id, verifier, is_valid)` stores the latest verifier result after verifier authorization.
-- `get_verification(credential_id)` retrieves the latest result.
+Stored data:
 
-Storage keeps one persistent latest-result record per credential ID. A later verification replaces the previous result.
+- Credential ID.
+- Issuer address.
+- Recipient address.
+- Credential hash.
+- Credential type.
+- Metadata URI.
+- Issued timestamp.
+- Revocation state.
 
 ## Reputation
 
-Methods:
+Purpose: store a candidate reputation score controlled by an admin.
 
-- `init_admin(admin)` initializes the score administrator once.
-- `set_score(admin, user, score)` stores a score from 0 through 100 after administrator authorization.
-- `get_score(user)` retrieves a score, defaulting to zero.
+Important methods:
 
-Storage keeps one persistent score per candidate address.
+- `name() -> String`
+- `init_admin(admin)`
+- `set_score(admin, user, score)`
+- `get_score(user) -> u32`
 
-The MVP keeps the packages independently deployable. A caller should verify credential existence and validity through `credential-registry` before recording a verification result, and then update the candidate score through the authorized reputation workflow. Cross-contract calls can be added later without changing these core data models.
+Authorization:
+
+- `init_admin` requires admin authorization and can be called only once.
+- `set_score` requires stored admin authorization.
+
+Constraints:
+
+- Score must be between 0 and 100.
+- Missing scores return 0.
+
+## Verification
+
+Purpose: store the latest verifier result for a credential.
+
+Important methods:
+
+- `name() -> String`
+- `record_verification(credential_id, verifier, is_valid)`
+- `get_verification(credential_id) -> Option<VerificationRecord>`
+
+Authorization:
+
+- `record_verification` requires verifier authorization.
+
+Stored data:
+
+- Credential ID.
+- Verifier address.
+- Validity boolean.
+- Verification timestamp.
+
+Only the latest verification result is stored per credential ID.
+
+## Backend Usage
+
+The backend currently uses Soroban clients for:
+
+- Preparing credential issuance transactions.
+- Fetching credentials.
+- Checking credential validity.
+- Preparing verification transactions.
+- Fetching verification records.
+- Fetching reputation scores.
+- Submitting signed transaction XDR.
+
+The backend `registerInstitution` Stellar service currently returns `501` and is not implemented end-to-end.
+
+## Build and Test
+
+From `contracts/`:
+
+```bash
+cargo fmt --all -- --check
+cargo test --workspace --all
+cargo build --workspace --release --target wasm32-unknown-unknown
+```
+
+Latest QA result recorded in `docs/testing.md`: 12 contract tests passed.
+
+## Security Notes
+
+- Contract authorization uses Soroban `require_auth` where implemented.
+- Contracts do not store private keys, seed phrases, passwords, or payment data.
+- Public Stellar addresses are part of the contract data model.
+- Deployment keys must stay in local Stellar CLI identities or hosting secret stores, never in Git.
